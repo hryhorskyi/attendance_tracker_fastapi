@@ -1,16 +1,8 @@
 from fastapi import FastAPI
-from typing import Union
-
-from app.db.database import create_tables
-from app.models.schemas.schemas import StudentCreate
-
+from app.api import attendance, student, university_class
 
 app = FastAPI()
 
-create_tables()
-
-@app.post("/students/")
-async def create_student(student: StudentCreate):
-    # Validate and process the incoming data
-    return {"name": student.name, "email": student.email}
-
+app.include_router(attendance.router, prefix="/attendance")
+app.include_router(student.router, prefix="/students")
+app.include_router(university_class.router, prefix="/classes")
