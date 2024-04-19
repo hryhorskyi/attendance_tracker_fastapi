@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from app.db.database import SessionLocal
@@ -13,14 +14,19 @@ def get_db():
     finally:
         db.close()
 
-@router.get("/students/{student_id}", response_model=Student)
+@router.get("/", response_model=List[Student])
+async def get_all_students(db: Session = Depends(get_db)):
+    students = db.query(StudentModel).all()
+    return students
+
+@router.get("/{student_id}", response_model=Student)
 async def get_student(student_id: int, db: Session = Depends(get_db)):
     student = db.query(StudentModel).filter(StudentModel.id == student_id).first()
     if student is None:
         raise HTTPException(status_code=404, detail="Student not found")
     return student
 
-@router.post("/students/", response_model=Student)
+@router.post("/", response_model=Student)
 async def create_student(student: StudentCreate, db: Session = Depends(get_db)):
     db_student = StudentModel(**student.dict())
     db.add(db_student)
@@ -28,7 +34,7 @@ async def create_student(student: StudentCreate, db: Session = Depends(get_db)):
     db.refresh(db_student)
     return db_student
 
-@router.put("/students/{student_id}", response_model=Student)
+@router.put("/{student_id}", response_model=Student)
 async def update_student(student_id: int, student: StudentCreate, db: Session = Depends(get_db)):
     db_student = db.query(StudentModel).filter(StudentModel.id == student_id).first()
     if db_student is None:
@@ -39,7 +45,7 @@ async def update_student(student_id: int, student: StudentCreate, db: Session = 
     db.refresh(db_student)
     return db_student
 
-@router.delete("/students/{student_id}")
+@router.delete("/{student_id}")
 async def delete_student(student_id: int, db: Session = Depends(get_db)):
     db_student = db.query(StudentModel).filter(StudentModel.id == student_id).first()
     if db_student is None:

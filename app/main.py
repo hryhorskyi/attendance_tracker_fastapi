@@ -1,9 +1,12 @@
 from fastapi import FastAPI
 from app.api import attendance, student, university_class
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from app.db.seeds import seed_data
 import uvicorn
 
 app = FastAPI(title="Attendance tracker API Service")
+
+seed_data()
 
 app.include_router(attendance.router, prefix="/attendance")
 app.include_router(student.router, prefix="/students")

@@ -22,7 +22,7 @@ def create_class(class_data: ClassCreate, db: Session = Depends(get_db)):
     return db_class
 
 @router.get("/{class_id}", response_model=ClassSchema)
-def read_class(class_id: int, db: Session = Depends(get_db)):
+def get_class(class_id: int, db: Session = Depends(get_db)):
     db_class = db.query(Class).filter(Class.id == class_id).first()
     if db_class is None:
         raise HTTPException(status_code=404, detail="Class not found")
